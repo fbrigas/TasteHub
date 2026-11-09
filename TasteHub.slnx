@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TasteHub.Api/TasteHub.Api.csproj" />
+  <Project Path="TasteHub.Data/TasteHub.Data.csproj" />
+  <Project Path="TasteHub.Entities/TasteHub.Entities.csproj" />
+</Solution>
