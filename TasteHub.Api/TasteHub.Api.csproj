@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TasteHub.Data\TasteHub.Data.csproj" />
+    <ProjectReference Include="..\TasteHub.Services\TasteHub.Services.csproj" />
   </ItemGroup>
 
 </Project>
