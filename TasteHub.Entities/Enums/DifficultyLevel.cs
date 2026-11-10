@@ -6,11 +6,3 @@ public enum DifficultyLevel
     Medium,
     Hard
 }
-
-public enum RecipeStatus
-{
-    Draft,
-    Pending,
-    Approved,
-    Rejected
-}

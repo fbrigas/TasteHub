@@ -9,6 +9,7 @@ public class Recipe
     public string Instructions { get; set; } = string.Empty;
     public int DurationInMinutes { get; set; } = 0; // Duration in minutes
     public DifficultyLevel Difficulty { get; set; } = DifficultyLevel.Easy; // Difficulty level of the recipe
+    public RecipeCategory Category { get; set; } = RecipeCategory.MainCourse; // Category of the recipe
     public int UserId { get; set; } // Foreign key to the User entity
     public User User { get; set; } = null!; // Navigation property to the User entity
     public RecipeStatus Status { get; set; } = RecipeStatus.Draft; // Status of the recipe
