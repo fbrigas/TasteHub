@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using TasteHub.Data;
+using TasteHub.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<RecipeService>();
 
 builder.Services.AddDbContext<TasteHubDbContext>(options =>
     options.UseSqlServer(
