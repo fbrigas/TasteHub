@@ -90,6 +90,7 @@ public class TasteHubDbContext : DbContext
         modelBuilder.Entity<Rating>()
             .HasIndex(r => new { r.UserId, r.RecipeId })
             .IsUnique();
+
     }
 
     public DbSet<User> Users { get; set; } = null!;

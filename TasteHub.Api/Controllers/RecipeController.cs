@@ -21,9 +21,28 @@ public class RecipesController : ControllerBase
     public IActionResult GetAll()
     {
         var recipes = _recipeService.GetAllRecipes();
+        List<RecipeResponseDto> dtos = new List<RecipeResponseDto>();
+        foreach (Recipe recipe in recipes)
+        {
+            RecipeResponseDto dto = new RecipeResponseDto
+            {
+                Id = recipe.Id,
+                Title = recipe.Title,
+                Description = recipe.Description,
+                Instructions = recipe.Instructions,
+                DurationInMinutes = recipe.DurationInMinutes,
+                Difficulty = recipe.Difficulty,
+                Category = recipe.Category,
+                Status = recipe.Status,
+                UserId = recipe.UserId
+            };
 
-        return Ok(recipes);
+            dtos.Add(dto);
+        }
+
+        return Ok(dtos);
     }
+
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
@@ -34,8 +53,22 @@ public class RecipesController : ControllerBase
             return NotFound();
         }
 
-        return Ok(recipe);
+        RecipeResponseDto dto = new RecipeResponseDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            Instructions = recipe.Instructions,
+            DurationInMinutes = recipe.DurationInMinutes,
+            Difficulty = recipe.Difficulty,
+            Category = recipe.Category,
+            Status = recipe.Status,
+            UserId = recipe.UserId
+        };
+
+        return Ok(dto);
     }
+
     [HttpPost]
     public IActionResult Create(CreateRecipeDto dto)
     {
@@ -53,10 +86,23 @@ public class RecipesController : ControllerBase
 
         _recipeService.AddRecipe(recipe);
 
+        RecipeResponseDto responseDto = new RecipeResponseDto
+        {
+            Id = recipe.Id,
+            Title = recipe.Title,
+            Description = recipe.Description,
+            Instructions = recipe.Instructions,
+            DurationInMinutes = recipe.DurationInMinutes,
+            Difficulty = recipe.Difficulty,
+            Category = recipe.Category,
+            Status = recipe.Status,
+            UserId = recipe.UserId
+        };
+
         return CreatedAtAction(
             nameof(GetById),
             new { id = recipe.Id },
-            recipe
+            responseDto
         );
     }
 

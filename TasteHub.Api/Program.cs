@@ -5,7 +5,7 @@ using TasteHub.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<RecipeService>();
-
+builder.Services.AddScoped<UserService>();
 builder.Services.AddDbContext<TasteHubDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
