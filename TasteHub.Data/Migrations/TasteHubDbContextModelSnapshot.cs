@@ -49,7 +49,7 @@ namespace TasteHub.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Favorite", b =>
@@ -73,7 +73,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("UserId", "RecipeId")
                         .IsUnique();
 
-                    b.ToTable("Favorites", (string)null);
+                    b.ToTable("Favorites");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Ingredient", b =>
@@ -88,9 +88,12 @@ namespace TasteHub.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Rating", b =>
@@ -117,7 +120,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("UserId", "RecipeId")
                         .IsUnique();
 
-                    b.ToTable("Ratings", (string)null);
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Recipe", b =>
@@ -159,7 +162,7 @@ namespace TasteHub.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Recipes", (string)null);
+                    b.ToTable("Recipes");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.RecipeIngredient", b =>
@@ -173,8 +176,9 @@ namespace TasteHub.Data.Migrations
                     b.Property<int>("IngredientId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
 
                     b.Property<int>("RecipeId")
                         .HasColumnType("int");
@@ -190,7 +194,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("RecipeId", "IngredientId")
                         .IsUnique();
 
-                    b.ToTable("RecipeIngredients", (string)null);
+                    b.ToTable("RecipeIngredients");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.User", b =>
@@ -225,7 +229,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Comment", b =>

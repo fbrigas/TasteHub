@@ -47,4 +47,33 @@ public class UserService
 
         return user;
     }
+
+    public User? ValidateUser(string email, string password)
+    {
+        string normalizedEmail = email.Trim().ToLowerInvariant();
+
+        User? user = _context.Users
+            .FirstOrDefault(u => u.Email == normalizedEmail);
+
+        if (user == null || user.IsBlocked)
+        {
+            return null;
+        }
+
+        PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
+
+        PasswordVerificationResult result =
+            passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                password
+            );
+
+        if (result == PasswordVerificationResult.Failed)
+        {
+            return null;
+        }
+
+        return user;
+    }
 }

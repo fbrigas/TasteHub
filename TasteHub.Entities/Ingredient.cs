@@ -3,7 +3,7 @@ namespace TasteHub.Entities;
 public class Ingredient
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;    
+    public string Name { get; set; } = string.Empty;
     public List<RecipeIngredient> RecipeIngredients { get; set; } = new();
-
+    public IngredientStatus Status { get; set; } = IngredientStatus.Pending;
 }

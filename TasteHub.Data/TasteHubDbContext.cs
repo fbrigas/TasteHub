@@ -83,6 +83,11 @@ public class TasteHubDbContext : DbContext
             .HasIndex(ri => new { ri.RecipeId, ri.IngredientId })
             .IsUnique();
 
+        // Definir a precisão das quantidades dos ingredientes
+        modelBuilder.Entity<RecipeIngredient>()
+            .Property(ri => ri.Quantity)
+            .HasPrecision(18, 3);
+
         modelBuilder.Entity<Favorite>()
             .HasIndex(f => new { f.UserId, f.RecipeId })
             .IsUnique();

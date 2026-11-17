@@ -25,6 +25,4 @@ public class CreateRecipeDto
     [EnumDataType(typeof(RecipeCategory))]
     public RecipeCategory Category { get; set; }
 
-    [Range(1, int.MaxValue)]
-    public int UserId { get; set; }
 }
