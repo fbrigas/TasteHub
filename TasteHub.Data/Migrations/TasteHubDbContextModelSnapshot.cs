@@ -49,7 +49,7 @@ namespace TasteHub.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Favorite", b =>
@@ -73,7 +73,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("UserId", "RecipeId")
                         .IsUnique();
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Ingredient", b =>
@@ -90,7 +90,7 @@ namespace TasteHub.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Rating", b =>
@@ -117,7 +117,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("UserId", "RecipeId")
                         .IsUnique();
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Ratings", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Recipe", b =>
@@ -159,7 +159,7 @@ namespace TasteHub.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Recipes");
+                    b.ToTable("Recipes", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.RecipeIngredient", b =>
@@ -190,7 +190,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("RecipeId", "IngredientId")
                         .IsUnique();
 
-                    b.ToTable("RecipeIngredients");
+                    b.ToTable("RecipeIngredients", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.User", b =>
@@ -225,7 +225,7 @@ namespace TasteHub.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TasteHub.Entities.Comment", b =>
