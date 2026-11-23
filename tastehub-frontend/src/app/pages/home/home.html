@@ -1,0 +1,17 @@
+<main>
+  <h2>Receitas da comunidade</h2>
+
+  @for (recipe of recipes; track recipe.id) {
+    <article>
+      <h3>
+        <a [routerLink]="['/recipes', recipe.id]">
+          {{ recipe.title }}
+        </a>
+      </h3>
+      <p>{{ recipe.description }}</p>
+      <p>⏱️ {{ recipe.durationInMinutes }} minutos</p>
+    </article>
+  } @empty {
+    <p>Ainda não existem receitas para apresentar.</p>
+  }
+</main>

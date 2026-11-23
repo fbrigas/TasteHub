@@ -1,0 +1,29 @@
+
+<main>
+  @if (recipe) {
+
+    <h2>{{ recipe.title }}</h2>
+
+    <p>{{ recipe.description }}</p>
+
+    <p>⏱️ Tempo de preparação: {{ recipe.durationInMinutes }} minutos</p>
+
+    <h3>🥕 Ingredientes</h3>
+
+    @for (ingredient of recipe.ingredients; track ingredient.ingredientId) {
+      <p>
+        {{ ingredient.name }} -
+        {{ ingredient.quantity }} {{ ingredient.unit }}
+      </p>
+    } @empty {
+      <p>Esta receita ainda não tem ingredientes associados.</p>
+    }
+
+    <h3>👨‍🍳 Modo de preparação</h3>
+
+    <p>{{ recipe.instructions }}</p>
+
+  } @else {
+    <p>A carregar receita...</p>
+  }
+</main><a routerLink="/">← Voltar às receitas</a>
