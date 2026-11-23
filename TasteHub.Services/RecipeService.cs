@@ -1,4 +1,4 @@
-
+using Microsoft.EntityFrameworkCore;
 using TasteHub.Data;
 using TasteHub.Entities;
 
@@ -16,13 +16,18 @@ public class RecipeService
     // Consultar todas as receitas (administrador)
     public List<Recipe> GetAllRecipes()
     {
-        return _context.Recipes.ToList();
+        return _context.Recipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(ri => ri.Ingredient)
+            .ToList();
     }
 
     // Consultar apenas receitas aprovadas
     public List<Recipe> GetApprovedRecipes()
     {
         return _context.Recipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(ri => ri.Ingredient)
             .Where(recipe => recipe.Status == RecipeStatus.Approved)
             .ToList();
     }
@@ -31,6 +36,8 @@ public class RecipeService
     public List<Recipe> GetRecipesByUserId(int userId)
     {
         return _context.Recipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(ri => ri.Ingredient)
             .Where(recipe => recipe.UserId == userId)
             .ToList();
     }
@@ -38,7 +45,10 @@ public class RecipeService
     // Consultar uma receita pelo ID
     public Recipe? GetRecipeById(int id)
     {
-        return _context.Recipes.Find(id);
+        return _context.Recipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(ri => ri.Ingredient)
+            .FirstOrDefault(r => r.Id == id);
     }
 
     // Criar uma receita
@@ -56,6 +66,39 @@ public class RecipeService
             throw new ArgumentException(
                 "A duração deve ser superior a zero."
             );
+        }
+
+        // Verificar se existem ingredientes repetidos
+        List<int> ingredientIds = recipe.Ingredients
+            .Select(i => i.IngredientId)
+            .ToList();
+
+        if (ingredientIds.Count != ingredientIds.Distinct().Count())
+        {
+            throw new ArgumentException(
+                "A receita não pode conter ingredientes repetidos."
+            );
+        }
+
+        // Verificar se os ingredientes existem e estão aprovados
+        foreach (RecipeIngredient recipeIngredient in recipe.Ingredients)
+        {
+            Ingredient? ingredient = _context.Ingredients
+                .FirstOrDefault(i => i.Id == recipeIngredient.IngredientId);
+
+            if (ingredient == null)
+            {
+                throw new ArgumentException(
+                    $"O ingrediente com ID {recipeIngredient.IngredientId} não existe."
+                );
+            }
+
+            if (ingredient.Status != IngredientStatus.Approved)
+            {
+                throw new ArgumentException(
+                    $"O ingrediente '{ingredient.Name}' ainda não está aprovado."
+                );
+            }
         }
 
         _context.Recipes.Add(recipe);

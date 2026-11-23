@@ -21,4 +21,5 @@ public class RecipeResponseDto
     public RecipeStatus Status { get; set; }
 
     public int UserId { get; set; }
+    public List<RecipeIngredientResponseDto> Ingredients { get; set; } = new();
 }

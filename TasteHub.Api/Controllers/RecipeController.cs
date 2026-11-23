@@ -41,7 +41,15 @@ public class RecipesController : ControllerBase
                 Difficulty = recipe.Difficulty,
                 Category = recipe.Category,
                 Status = recipe.Status,
-                UserId = recipe.UserId
+                UserId = recipe.UserId,
+
+                Ingredients = recipe.Ingredients.Select(ri => new RecipeIngredientResponseDto
+                {
+                    IngredientId = ri.IngredientId,
+                    Name = ri.Ingredient.Name,
+                    Quantity = ri.Quantity,
+                    Unit = ri.Unit
+                }).ToList()
             };
 
             dtos.Add(dto);
@@ -78,7 +86,15 @@ public class RecipesController : ControllerBase
                 Difficulty = recipe.Difficulty,
                 Category = recipe.Category,
                 Status = recipe.Status,
-                UserId = recipe.UserId
+                UserId = recipe.UserId,
+
+                Ingredients = recipe.Ingredients.Select(ri => new RecipeIngredientResponseDto
+                {
+                    IngredientId = ri.IngredientId,
+                    Name = ri.Ingredient.Name,
+                    Quantity = ri.Quantity,
+                    Unit = ri.Unit
+                }).ToList()
             };
 
             dtos.Add(dto);
@@ -121,7 +137,15 @@ public class RecipesController : ControllerBase
             Difficulty = recipe.Difficulty,
             Category = recipe.Category,
             Status = recipe.Status,
-            UserId = recipe.UserId
+            UserId = recipe.UserId,
+
+            Ingredients = recipe.Ingredients.Select(ri => new RecipeIngredientResponseDto
+            {
+                IngredientId = ri.IngredientId,
+                Name = ri.Ingredient.Name,
+                Quantity = ri.Quantity,
+                Unit = ri.Unit
+            }).ToList()
         };
 
         return Ok(dto);
@@ -151,7 +175,14 @@ public class RecipesController : ControllerBase
             Difficulty = dto.Difficulty,
             Category = dto.Category,
             UserId = userId,
-            Status = RecipeStatus.Draft
+            Status = RecipeStatus.Draft,
+
+            Ingredients = dto.Ingredients.Select(item => new RecipeIngredient
+            {
+                IngredientId = item.IngredientId,
+                Quantity = item.Quantity,
+                Unit = item.Unit.Trim()
+            }).ToList()
         };
 
         try
