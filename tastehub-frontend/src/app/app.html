@@ -2,6 +2,21 @@
 <header>
   <h1>🍅 TasteHub</h1>
   <p>Partilha e descobre receitas deliciosas!</p>
+
+  <nav>
+    <a routerLink="/">Início</a>
+
+    @if (authService.getUser()) {
+      <p>👤 Bem-vindo, {{ authService.getUser()?.name }}!</p>
+
+      <button type="button" (click)="logout()">
+        Terminar sessão
+      </button>
+    } @else {
+      <a routerLink="/login">Iniciar sessão</a>
+      <a routerLink="/register">Criar conta</a>
+    }
+  </nav>
 </header>
 
 <router-outlet></router-outlet>

@@ -1,0 +1,33 @@
+<main>
+  <h2>Iniciar sessão</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="Introduz o teu email"
+        required
+        [(ngModel)]="email"
+      />
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Introduz a tua password"
+        required
+        [(ngModel)]="password"
+      />
+    </div>
+    @if (errorMessage()) {
+      <p style="color: red">{{ errorMessage() }}</p>
+    }
+    <button type="submit">Entrar</button>
+  </form>
+</main>

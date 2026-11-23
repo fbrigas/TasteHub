@@ -1,0 +1,46 @@
+<main>
+  <h2>Criar conta</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div>
+      <label for="name">Nome:</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        [(ngModel)]="name"
+        placeholder="Introduz o teu nome"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="Introduz o teu email"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="password"
+        placeholder="Cria uma password"
+        required
+      />
+    </div>
+    @if (errorMessage()) {
+      <p style="color: red">{{ errorMessage() }}</p>
+    }
+    
+    <button type="submit">Criar conta</button>
+  </form>
+</main>
