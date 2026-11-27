@@ -1,0 +1,59 @@
+<main>
+  <h2>🍅 As minhas receitas</h2>
+
+  <a routerLink="/recipes/create"> ➕ Criar nova receita </a>
+
+  @if (successMessage()) {
+    <p class="success-message">✅ {{ successMessage() }}</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message">❌ {{ errorMessage() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p>A carregar receitas...</p>
+  } @else if (recipes().length === 0 && !errorMessage()) {
+    <p>Ainda não criaste nenhuma receita.</p>
+  } @else {
+    @for (recipe of recipes(); track recipe.id) {
+      <article class="recipe-card">
+        <h3>{{ recipe.title }}</h3>
+
+        <p>{{ recipe.description }}</p>
+
+        <p>⏱️ {{ recipe.durationInMinutes }} minutos</p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ getStatus(recipe.status) }}
+        </p>
+
+        <div class="recipe-actions">
+          <a [routerLink]="['/recipes', recipe.id]" [queryParams]="{ from: 'my-recipes' }">
+            👁️ Ver detalhes
+          </a>
+
+          @if (recipe.status === 0) {
+            <button
+              type="button"
+              (click)="submitRecipe(recipe.id)"
+              [disabled]="isProcessing(recipe.id)"
+            >
+              {{ isProcessing(recipe.id) ? 'A processar...' : '📤 Submeter para aprovação' }}
+            </button>
+            <a [routerLink]="['/recipes', recipe.id, 'edit']"> ✏️ Editar </a>
+          }
+
+          <button
+            type="button"
+            (click)="deleteRecipe(recipe.id)"
+            [disabled]="isProcessing(recipe.id)"
+          >
+            {{ isProcessing(recipe.id) ? 'A processar...' : '🗑️ Eliminar' }}
+          </button>
+        </div>
+      </article>
+    }
+  }
+</main>

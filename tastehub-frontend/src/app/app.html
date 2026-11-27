@@ -1,22 +1,42 @@
-
 <header>
   <h1>🍅 TasteHub</h1>
   <p>Partilha e descobre receitas deliciosas!</p>
 
   <nav>
+    <!-- Página inicial -->
     <a routerLink="/">Início</a>
 
     @if (authService.getUser()) {
-      <p>👤 Bem-vindo, {{ authService.getUser()?.name }}!</p>
+      <!-- Criar receita -->
+      <a routerLink="/recipes/create"> 🍅 Criar receita </a>
 
-      <button type="button" (click)="logout()">
-        Terminar sessão
-      </button>
+      <!-- Receitas do utilizador -->
+      <a routerLink="/my-recipes"> 📖 As minhas receitas </a>
+
+      <!-- Favoritos -->
+      <a routerLink="/favorites"> ❤️ Os meus favoritos </a>
+
+      <!-- Sugerir ingrediente -->
+      <a routerLink="/ingredients/suggest"> 🥕 Sugerir ingrediente </a>
+
+      <!-- Administração: apenas para administradores -->
+      @if (authService.getUser()?.role === 'Admin') {
+        <a routerLink="/admin"> 🛡️ Administração </a>
+      }
+
+      <!-- Utilizador autenticado -->
+      <span> 👤 Bem-vindo, {{ authService.getUser()?.name }}! </span>
+
+      <!-- Terminar sessão -->
+      <button type="button" (click)="logout()">Terminar sessão</button>
     } @else {
-      <a routerLink="/login">Iniciar sessão</a>
-      <a routerLink="/register">Criar conta</a>
+      <!-- Utilizador não autenticado -->
+      <a routerLink="/login"> Iniciar sessão </a>
+
+      <a routerLink="/register"> Criar conta </a>
     }
   </nav>
 </header>
 
+<!-- Conteúdo das páginas -->
 <router-outlet></router-outlet>

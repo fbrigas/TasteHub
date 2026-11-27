@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 using TasteHub.Entities;
 
@@ -24,6 +25,8 @@ public class CreateRecipeDto
 
     [EnumDataType(typeof(RecipeCategory))]
     public RecipeCategory Category { get; set; }
+
     public List<RecipeIngredientDto> Ingredients { get; set; } = new();
 
+    public List<NewRecipeIngredientDto> NewIngredients { get; set; } = new();
 }

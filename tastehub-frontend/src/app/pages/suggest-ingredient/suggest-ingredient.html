@@ -1,0 +1,36 @@
+<main>
+  <h2>🥕 Sugerir ingrediente</h2>
+
+  <p>Não encontras um ingrediente na lista? Sugere-o para aprovação pelo administrador.</p>
+
+  <form (ngSubmit)="suggestIngredient()">
+    <div>
+      <label for="ingredientName"> Nome do ingrediente </label>
+
+      <input
+        id="ingredientName"
+        name="ingredientName"
+        type="text"
+        [(ngModel)]="ingredientName"
+        minlength="2"
+        maxlength="100"
+        placeholder="Ex.: Batata-doce"
+        required
+      />
+    </div>
+
+    <button type="submit" [disabled]="isSaving()">
+      {{ isSaving() ? 'A enviar...' : '🥕 Enviar sugestão' }}
+    </button>
+  </form>
+
+  @if (successMessage()) {
+    <p class="success-message">✅ {{ successMessage() }}</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message">❌ {{ errorMessage() }}</p>
+  }
+
+  <a routerLink="/recipes/create"> ← Voltar à criação de receitas </a>
+</main>

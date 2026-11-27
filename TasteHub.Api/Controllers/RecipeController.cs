@@ -152,17 +152,42 @@ public class RecipesController : ControllerBase
     }
 
     // POST: api/recipes
+
     [Authorize]
     [HttpPost]
     public IActionResult Create(CreateRecipeDto dto)
     {
-        string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userIdClaim =
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized(new
             {
                 message = "Não foi possível identificar o utilizador."
+            });
+        }
+
+        var ingredients = dto.Ingredients
+            .Select(item => new RecipeIngredient
+            {
+                IngredientId = item.IngredientId,
+                Quantity = item.Quantity,
+                Unit = item.Unit
+            })
+            .ToList();
+
+        foreach (var item in dto.NewIngredients)
+        {
+            ingredients.Add(new RecipeIngredient
+            {
+                Ingredient = new Ingredient
+                {
+                    Name = item.Name.Trim(),
+                    Status = IngredientStatus.Pending
+                },
+                Quantity = item.Quantity,
+                Unit = item.Unit
             });
         }
 
@@ -176,13 +201,7 @@ public class RecipesController : ControllerBase
             Category = dto.Category,
             UserId = userId,
             Status = RecipeStatus.Draft,
-
-            Ingredients = dto.Ingredients.Select(item => new RecipeIngredient
-            {
-                IngredientId = item.IngredientId,
-                Quantity = item.Quantity,
-                Unit = item.Unit.Trim()
-            }).ToList()
+            Ingredients = ingredients
         };
 
         try
@@ -204,7 +223,17 @@ public class RecipesController : ControllerBase
             Difficulty = recipe.Difficulty,
             Category = recipe.Category,
             Status = recipe.Status,
-            UserId = recipe.UserId
+            UserId = recipe.UserId,
+
+            Ingredients = recipe.Ingredients
+                .Select(ri => new RecipeIngredientResponseDto
+                {
+                    IngredientId = ri.IngredientId,
+                    Name = ri.Ingredient.Name,
+                    Quantity = ri.Quantity,
+                    Unit = ri.Unit
+                })
+                .ToList()
         };
 
         return CreatedAtAction(
@@ -213,6 +242,7 @@ public class RecipesController : ControllerBase
             responseDto
         );
     }
+
 
     // POST: api/recipes/{id}/submit
     [Authorize]

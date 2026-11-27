@@ -1,0 +1,90 @@
+<main>
+  <h2>✏️ Editar receita</h2>
+
+  @if (isLoading()) {
+    <p>A carregar receita...</p>
+  } @else if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+    <button type="button" (click)="cancel()">Voltar às minhas receitas</button>
+  } @else {
+    <form (ngSubmit)="saveRecipe()">
+      <div>
+        <label for="title">Título da receita:</label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          [(ngModel)]="title"
+          minlength="3"
+          maxlength="100"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="description">Descrição:</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="description"
+          maxlength="2000"
+          required
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="instructions">Instruções:</label>
+        <textarea
+          id="instructions"
+          name="instructions"
+          [(ngModel)]="instructions"
+          required
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="duration">Tempo de preparação (minutos):</label>
+        <input
+          id="duration"
+          name="duration"
+          type="number"
+          [(ngModel)]="durationInMinutes"
+          min="1"
+          max="1440"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="difficulty">Dificuldade:</label>
+        <select id="difficulty" name="difficulty" [(ngModel)]="difficulty">
+          <option [ngValue]="0">Fácil</option>
+          <option [ngValue]="1">Médio</option>
+          <option [ngValue]="2">Difícil</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="category">Categoria:</label>
+        <select id="category" name="category" [(ngModel)]="category">
+          <option [ngValue]="0">Entrada</option>
+          <option [ngValue]="1">Prato principal</option>
+          <option [ngValue]="2">Sobremesa</option>
+          <option [ngValue]="3">Sopa</option>
+          <option [ngValue]="4">Bebida</option>
+          <option [ngValue]="5">Lanche</option>
+        </select>
+      </div>
+
+      @if (successMessage()) {
+        <p>{{ successMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSaving()">
+        {{ isSaving() ? 'A guardar...' : '💾 Guardar alterações' }}
+      </button>
+
+      <button type="button" (click)="cancel()">Cancelar</button>
+    </form>
+  }
+</main>

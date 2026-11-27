@@ -15,6 +15,9 @@ builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<IngredientService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<RecipeService>();
+builder.Services.AddScoped<IngredientService>();
+builder.Services.AddScoped<FavoriteService>();
 
 // Base de dados
 builder.Services.AddDbContext<TasteHubDbContext>(options =>

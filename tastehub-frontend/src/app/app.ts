@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth';
 
 @Component({
@@ -14,6 +14,6 @@ export class App {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/']);  
+    this.router.navigate(['/']);
   }
 }

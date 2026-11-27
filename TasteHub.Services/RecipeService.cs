@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using TasteHub.Data;
 using TasteHub.Entities;
@@ -13,99 +14,157 @@ public class RecipeService
         _context = context;
     }
 
-    // Consultar todas as receitas (administrador)
+    private IQueryable<Recipe> RecipesWithIngredients()
+    {
+        return _context.Recipes
+            .Include(r => r.Ingredients)
+            .ThenInclude(ri => ri.Ingredient);
+    }
+
     public List<Recipe> GetAllRecipes()
     {
-        return _context.Recipes
-            .Include(r => r.Ingredients)
-            .ThenInclude(ri => ri.Ingredient)
-            .ToList();
+        return RecipesWithIngredients().ToList();
     }
 
-    // Consultar apenas receitas aprovadas
     public List<Recipe> GetApprovedRecipes()
     {
-        return _context.Recipes
-            .Include(r => r.Ingredients)
-            .ThenInclude(ri => ri.Ingredient)
-            .Where(recipe => recipe.Status == RecipeStatus.Approved)
+        return RecipesWithIngredients()
+            .Where(r => r.Status == RecipeStatus.Approved)
             .ToList();
     }
 
-    // Consultar receitas de um utilizador
     public List<Recipe> GetRecipesByUserId(int userId)
     {
-        return _context.Recipes
-            .Include(r => r.Ingredients)
-            .ThenInclude(ri => ri.Ingredient)
-            .Where(recipe => recipe.UserId == userId)
+        return RecipesWithIngredients()
+            .Where(r => r.UserId == userId)
             .ToList();
     }
 
-    // Consultar uma receita pelo ID
     public Recipe? GetRecipeById(int id)
     {
-        return _context.Recipes
-            .Include(r => r.Ingredients)
-            .ThenInclude(ri => ri.Ingredient)
+        return RecipesWithIngredients()
             .FirstOrDefault(r => r.Id == id);
     }
 
-    // Criar uma receita
     public void AddRecipe(Recipe recipe)
     {
         if (string.IsNullOrWhiteSpace(recipe.Title))
         {
             throw new ArgumentException(
-                "O título da receita é obrigatório."
-            );
+                "O título da receita é obrigatório.");
         }
 
         if (recipe.DurationInMinutes <= 0)
         {
             throw new ArgumentException(
-                "A duração deve ser superior a zero."
-            );
+                "A duração deve ser superior a zero.");
         }
 
-        // Verificar se existem ingredientes repetidos
-        List<int> ingredientIds = recipe.Ingredients
-            .Select(i => i.IngredientId)
-            .ToList();
-
-        if (ingredientIds.Count != ingredientIds.Distinct().Count())
+        if (recipe.Ingredients == null ||
+            recipe.Ingredients.Count == 0)
         {
             throw new ArgumentException(
-                "A receita não pode conter ingredientes repetidos."
-            );
+                "Adiciona pelo menos um ingrediente.");
         }
 
-        // Verificar se os ingredientes existem e estão aprovados
-        foreach (RecipeIngredient recipeIngredient in recipe.Ingredients)
+        var existingIds = recipe.Ingredients
+            .Where(ri => ri.IngredientId > 0)
+            .Select(ri => ri.IngredientId)
+            .ToList();
+
+        if (existingIds.Count != existingIds.Distinct().Count())
         {
-            Ingredient? ingredient = _context.Ingredients
-                .FirstOrDefault(i => i.Id == recipeIngredient.IngredientId);
+            throw new ArgumentException(
+                "A receita não pode conter ingredientes repetidos.");
+        }
 
-            if (ingredient == null)
+        var newNames = new HashSet<string>(
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (var item in recipe.Ingredients)
+        {
+            if (item.Quantity <= 0 ||
+                string.IsNullOrWhiteSpace(item.Unit))
             {
                 throw new ArgumentException(
-                    $"O ingrediente com ID {recipeIngredient.IngredientId} não existe."
-                );
+                    "Todos os ingredientes precisam de quantidade e unidade.");
             }
 
-            if (ingredient.Status != IngredientStatus.Approved)
+            item.Unit = item.Unit.Trim();
+
+            if (item.IngredientId > 0)
             {
-                throw new ArgumentException(
-                    $"O ingrediente '{ingredient.Name}' ainda não está aprovado."
-                );
+                var existing = _context.Ingredients
+                    .FirstOrDefault(i =>
+                        i.Id == item.IngredientId);
+
+                if (existing == null)
+                {
+                    throw new ArgumentException(
+                        $"O ingrediente com ID {item.IngredientId} não existe.");
+                }
+
+                if (existing.Status != IngredientStatus.Approved)
+                {
+                    throw new ArgumentException(
+                        $"O ingrediente '{existing.Name}' não está aprovado.");
+                }
+            }
+            else
+            {
+                if (item.Ingredient == null ||
+                    string.IsNullOrWhiteSpace(item.Ingredient.Name))
+                {
+                    throw new ArgumentException(
+                        "O nome do novo ingrediente é obrigatório.");
+                }
+
+                string name = item.Ingredient.Name.Trim();
+
+                if (name.Length < 2 || name.Length > 100)
+                {
+                    throw new ArgumentException(
+                        "O nome do ingrediente deve ter entre 2 e 100 caracteres.");
+                }
+
+                if (!newNames.Add(name))
+                {
+                    throw new ArgumentException(
+                        $"O ingrediente '{name}' está repetido.");
+                }
+
+                bool exists = _context.Ingredients
+                    .Any(i => i.Name.ToLower() == name.ToLower());
+
+                if (exists)
+                {
+                    throw new ArgumentException(
+                        $"O ingrediente '{name}' já existe. Não podes sugeri-lo novamente.");
+                }
+
+                item.Ingredient.Name = name;
+                item.Ingredient.Status = IngredientStatus.Pending;
             }
         }
 
-        _context.Recipes.Add(recipe);
-        _context.SaveChanges();
+        using var transaction = _context.Database.BeginTransaction();
+
+        try
+        {
+            recipe.Status = RecipeStatus.Draft;
+
+            _context.Recipes.Add(recipe);
+            _context.SaveChanges();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
-    // Atualizar uma receita
     public void UpdateRecipe(int id, Recipe updatedRecipe)
     {
         Recipe? existingRecipe = _context.Recipes.Find(id);
@@ -113,44 +172,39 @@ public class RecipeService
         if (existingRecipe == null)
         {
             throw new KeyNotFoundException(
-                "Receita não encontrada."
-            );
+                "Receita não encontrada.");
         }
 
-        // Apenas rascunhos e receitas rejeitadas podem ser editados
         if (existingRecipe.Status != RecipeStatus.Draft &&
             existingRecipe.Status != RecipeStatus.Rejected)
         {
             throw new InvalidOperationException(
-                "Apenas receitas em rascunho ou rejeitadas podem ser editadas."
-            );
+                "Apenas receitas em rascunho ou rejeitadas podem ser editadas.");
         }
 
         if (string.IsNullOrWhiteSpace(updatedRecipe.Title))
         {
             throw new ArgumentException(
-                "O título da receita é obrigatório."
-            );
+                "O título da receita é obrigatório.");
         }
 
         if (updatedRecipe.DurationInMinutes <= 0)
         {
             throw new ArgumentException(
-                "A duração deve ser superior a zero."
-            );
+                "A duração deve ser superior a zero.");
         }
 
         existingRecipe.Title = updatedRecipe.Title;
-        existingRecipe.DurationInMinutes = updatedRecipe.DurationInMinutes;
         existingRecipe.Description = updatedRecipe.Description;
         existingRecipe.Instructions = updatedRecipe.Instructions;
+        existingRecipe.DurationInMinutes =
+            updatedRecipe.DurationInMinutes;
         existingRecipe.Difficulty = updatedRecipe.Difficulty;
         existingRecipe.Category = updatedRecipe.Category;
 
         _context.SaveChanges();
     }
 
-    // Eliminar uma receita
     public void DeleteRecipe(int id)
     {
         Recipe? recipe = _context.Recipes.Find(id);
@@ -158,15 +212,13 @@ public class RecipeService
         if (recipe == null)
         {
             throw new KeyNotFoundException(
-                "Receita não encontrada."
-            );
+                "Receita não encontrada.");
         }
 
         _context.Recipes.Remove(recipe);
         _context.SaveChanges();
     }
 
-    // Submeter uma receita para aprovação
     public void SubmitRecipe(int id)
     {
         Recipe? recipe = _context.Recipes.Find(id);
@@ -174,48 +226,55 @@ public class RecipeService
         if (recipe == null)
         {
             throw new KeyNotFoundException(
-                "Receita não encontrada."
-            );
+                "Receita não encontrada.");
         }
 
         if (recipe.Status != RecipeStatus.Draft &&
             recipe.Status != RecipeStatus.Rejected)
         {
             throw new InvalidOperationException(
-                "Esta receita não pode ser submetida neste estado."
-            );
+                "Esta receita não pode ser submetida neste estado.");
         }
 
         recipe.Status = RecipeStatus.Pending;
-
         _context.SaveChanges();
     }
 
-    // Aprovar uma receita
     public void ApproveRecipe(int id)
     {
-        Recipe? recipe = _context.Recipes.Find(id);
+        Recipe? recipe = RecipesWithIngredients()
+            .FirstOrDefault(r => r.Id == id);
 
         if (recipe == null)
         {
             throw new KeyNotFoundException(
-                "Receita não encontrada."
-            );
+                "Receita não encontrada.");
         }
 
         if (recipe.Status != RecipeStatus.Pending)
         {
             throw new InvalidOperationException(
-                "Apenas receitas pendentes podem ser aprovadas."
-            );
+                "Apenas receitas pendentes podem ser aprovadas.");
+        }
+
+        var unapprovedIngredients = recipe.Ingredients
+            .Where(ri =>
+                ri.Ingredient.Status != IngredientStatus.Approved)
+            .Select(ri => ri.Ingredient.Name)
+            .ToList();
+
+        if (unapprovedIngredients.Count > 0)
+        {
+            throw new InvalidOperationException(
+                "Não é possível aprovar esta receita. " +
+                "Existem ingredientes pendentes ou rejeitados: " +
+                string.Join(", ", unapprovedIngredients));
         }
 
         recipe.Status = RecipeStatus.Approved;
-
         _context.SaveChanges();
     }
 
-    // Rejeitar uma receita
     public void RejectRecipe(int id)
     {
         Recipe? recipe = _context.Recipes.Find(id);
@@ -223,19 +282,16 @@ public class RecipeService
         if (recipe == null)
         {
             throw new KeyNotFoundException(
-                "Receita não encontrada."
-            );
+                "Receita não encontrada.");
         }
 
         if (recipe.Status != RecipeStatus.Pending)
         {
             throw new InvalidOperationException(
-                "Apenas receitas pendentes podem ser rejeitadas."
-            );
+                "Apenas receitas pendentes podem ser rejeitadas.");
         }
 
         recipe.Status = RecipeStatus.Rejected;
-
         _context.SaveChanges();
     }
 }

@@ -1,19 +1,52 @@
-
 <main>
-  @if (recipe) {
+  @if (isLoading()) {
+    <p>A carregar receita...</p>
+  } @else if (errorMessage()) {
+    <h2>⚠️ Não foi possível abrir a receita</h2>
 
-    <h2>{{ recipe.title }}</h2>
+    <p>{{ errorMessage() }}</p>
+  } @else if (recipe(); as currentRecipe) {
+    <h2>🍅 {{ currentRecipe.title }}</h2>
 
-    <p>{{ recipe.description }}</p>
+    <p>{{ currentRecipe.description }}</p>
 
-    <p>⏱️ Tempo de preparação: {{ recipe.durationInMinutes }} minutos</p>
+    <p>
+      ⏱️ Tempo de preparação:
+      {{ currentRecipe.durationInMinutes }} minutos
+    </p>
+
+    <!-- Favoritos -->
+    @if (isLoggedIn() && currentRecipe.status === 2) {
+      <section>
+        <button
+          type="button"
+          (click)="toggleFavorite(currentRecipe.id)"
+          [disabled]="isSavingFavorite() || isLoadingFavorite()"
+        >
+          @if (isLoadingFavorite()) {
+            A verificar favoritos...
+          } @else if (isSavingFavorite()) {
+            A guardar...
+          } @else if (isFavorite()) {
+            ❤️ Remover dos favoritos
+          } @else {
+            🤍 Adicionar aos favoritos
+          }
+        </button>
+
+        @if (favoriteMessage()) {
+          <p>{{ favoriteMessage() }}</p>
+        }
+      </section>
+    }
 
     <h3>🥕 Ingredientes</h3>
 
-    @for (ingredient of recipe.ingredients; track ingredient.ingredientId) {
+    @for (ingredient of currentRecipe.ingredients; track $index) {
       <p>
         {{ ingredient.name }} -
-        {{ ingredient.quantity }} {{ ingredient.unit }}
+        {{ ingredient.quantity }}
+        {{ ingredient.unit }}
       </p>
     } @empty {
       <p>Esta receita ainda não tem ingredientes associados.</p>
@@ -21,9 +54,10 @@
 
     <h3>👨‍🍳 Modo de preparação</h3>
 
-    <p>{{ recipe.instructions }}</p>
-
-  } @else {
-    <p>A carregar receita...</p>
+    <p>{{ currentRecipe.instructions }}</p>
   }
-</main><a routerLink="/">← Voltar às receitas</a>
+
+  <a [routerLink]="backUrl">
+    {{ backText }}
+  </a>
+</main>

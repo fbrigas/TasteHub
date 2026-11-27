@@ -1,5 +1,4 @@
 namespace TasteHub.Entities;
-
 public enum RecipeCategory
 {
     Starter,

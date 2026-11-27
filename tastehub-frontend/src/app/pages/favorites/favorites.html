@@ -1,0 +1,42 @@
+<main>
+  <h2>❤️ Os meus favoritos</h2>
+
+  @if (isLoading()) {
+    <p>A carregar favoritos...</p>
+  } @else if (errorMessage()) {
+    <p>⚠️ {{ errorMessage() }}</p>
+  } @else {
+    @if (successMessage()) {
+      <p>✅ {{ successMessage() }}</p>
+    }
+
+    @for (recipe of recipes(); track recipe.id) {
+      <article>
+        <h3>🍅 {{ recipe.title }}</h3>
+
+        <p>{{ recipe.description }}</p>
+
+        <p>⏱️ {{ recipe.durationInMinutes }} minutos</p>
+
+        <a [routerLink]="['/recipes', recipe.id]" [queryParams]="{ from: 'favorites' }">
+          Ver receita
+        </a>
+
+        <button
+          type="button"
+          (click)="removeFavorite(recipe.id)"
+          [disabled]="removingIds().includes(recipe.id)"
+        >
+          @if (removingIds().includes(recipe.id)) {
+            A remover...
+          } @else {
+            ❤️ Remover dos favoritos
+          }
+        </button>
+      </article>
+    } @empty {
+      <p>Ainda não tens receitas nos favoritos.</p>
+      <a routerLink="/">Explorar receitas</a>
+    }
+  }
+</main>

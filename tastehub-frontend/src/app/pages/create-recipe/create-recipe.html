@@ -1,0 +1,192 @@
+<main>
+  <h2>🍅 Criar nova receita</h2>
+
+  <form (ngSubmit)="saveRecipe()">
+    <div>
+      <label for="title">Título da receita:</label>
+      <input
+        id="title"
+        name="title"
+        type="text"
+        [(ngModel)]="title"
+        minlength="3"
+        maxlength="100"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="description">Descrição:</label>
+      <textarea
+        id="description"
+        name="description"
+        [(ngModel)]="description"
+        maxlength="2000"
+        required
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="instructions">Instruções:</label>
+      <textarea
+        id="instructions"
+        name="instructions"
+        [(ngModel)]="instructions"
+        required
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="duration">Duração (minutos):</label>
+      <input
+        id="duration"
+        name="duration"
+        type="number"
+        [(ngModel)]="durationInMinutes"
+        min="1"
+        max="1440"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="difficulty">Dificuldade:</label>
+      <select id="difficulty" name="difficulty" [(ngModel)]="difficulty">
+        <option [ngValue]="0">Fácil</option>
+        <option [ngValue]="1">Médio</option>
+        <option [ngValue]="2">Difícil</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="category">Categoria:</label>
+      <select id="category" name="category" [(ngModel)]="category">
+        <option [ngValue]="0">Entrada</option>
+        <option [ngValue]="1">Prato principal</option>
+        <option [ngValue]="2">Sobremesa</option>
+        <option [ngValue]="3">Sopa</option>
+        <option [ngValue]="4">Bebida</option>
+        <option [ngValue]="5">Lanche</option>
+      </select>
+    </div>
+
+    <hr />
+
+    <section>
+      <h3>🥕 Ingredientes existentes</h3>
+
+      <label for="ingredientId">Ingrediente:</label>
+      <select id="ingredientId" name="ingredientId" [(ngModel)]="newIngredientId">
+        <option [ngValue]="0">Selecionar ingrediente</option>
+
+        @for (ingredient of availableIngredients; track ingredient.id) {
+          <option [ngValue]="ingredient.id">
+            {{ ingredient.name }}
+          </option>
+        }
+      </select>
+
+      <label for="quantity">Quantidade:</label>
+      <input
+        id="quantity"
+        name="quantity"
+        type="number"
+        [(ngModel)]="newQuantity"
+        min="0.001"
+        step="0.001"
+      />
+
+      <label for="unit">Unidade:</label>
+      <input id="unit" name="unit" type="text" [(ngModel)]="newUnit" maxlength="20" />
+
+      <button type="button" (click)="addIngredient()">+ Adicionar ingrediente existente</button>
+    </section>
+
+    <hr />
+
+    <section>
+      <h3>➕ Não encontras o ingrediente?</h3>
+
+      <p>Adiciona um ingrediente novo. Ficará pendente de aprovação juntamente com a receita.</p>
+
+      <label for="suggestedName">Nome do novo ingrediente:</label>
+      <input
+        id="suggestedName"
+        name="suggestedName"
+        type="text"
+        [(ngModel)]="suggestedName"
+        maxlength="100"
+        placeholder="Ex.: Farinha de amêndoa"
+      />
+
+      <label for="suggestedQuantity">Quantidade:</label>
+      <input
+        id="suggestedQuantity"
+        name="suggestedQuantity"
+        type="number"
+        [(ngModel)]="suggestedQuantity"
+        min="0.001"
+        step="0.001"
+      />
+
+      <label for="suggestedUnit">Unidade:</label>
+      <input
+        id="suggestedUnit"
+        name="suggestedUnit"
+        type="text"
+        [(ngModel)]="suggestedUnit"
+        maxlength="20"
+      />
+
+      <button type="button" (click)="addNewIngredient()">🥕 Adicionar novo ingrediente</button>
+    </section>
+
+    <hr />
+
+    <section>
+      <h3>📋 Ingredientes da receita</h3>
+
+      @for (ingredient of ingredients; track $index) {
+        <div>
+          <p>
+            ✅ {{ getIngredientName(ingredient.ingredientId) }} — {{ ingredient.quantity }}
+            {{ ingredient.unit }}
+          </p>
+
+          <button type="button" (click)="removeIngredient($index)">🗑️ Remover</button>
+        </div>
+      }
+
+      @for (ingredient of newIngredients; track $index) {
+        <div>
+          <p>
+            ⏳ {{ ingredient.name }} — {{ ingredient.quantity }} {{ ingredient.unit }}
+            (novo ingrediente)
+          </p>
+
+          <button type="button" (click)="removeNewIngredient($index)">🗑️ Remover</button>
+        </div>
+      }
+
+      @if (ingredients.length + newIngredients.length === 0) {
+        <p>Ainda não adicionaste ingredientes.</p>
+      }
+    </section>
+
+    @if (errorMessage) {
+      <p class="error-message">❌ {{ errorMessage }}</p>
+    }
+
+    <button type="submit" [disabled]="isSaving()">
+      {{ isSaving() ? 'A guardar...' : '🍅 Criar receita' }}
+    </button>
+
+    @if (saveMessage()) {
+      <p>{{ saveMessage() }}</p>
+    }
+
+    <p>
+      <a routerLink="/my-recipes">📖 Ver as minhas receitas</a>
+    </p>
+  </form>
+</main>
